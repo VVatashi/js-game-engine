@@ -1,0 +1,17 @@
+{
+  "name": "@vvatashi/js-game-engine",
+  "version": "1.0.0",
+  "description": "",
+  "author": "VVatashi",
+  "license": "MIT",
+  "private": "true",
+  "type": "module",
+  "main": "src/index.js",
+  "devDependencies": {
+    "cross-env": "^7.0.3",
+    "jest": "^29.7.0"
+  },
+  "scripts": {
+    "test": "cross-env NODE_OPTIONS=\"$NODE_OPTIONS --experimental-vm-modules\" NODE_NO_WARNINGS=1 npx jest"
+  }
+}
