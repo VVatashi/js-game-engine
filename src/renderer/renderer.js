@@ -2,6 +2,7 @@ export class Renderer {
     /** @param {HTMLCanvasElement} canvas */
     constructor(canvas) {
         this.context = canvas.getContext('webgl2', { antialias: false });
+        this.context.enable(this.context.CULL_FACE);
     }
 
     resize() {

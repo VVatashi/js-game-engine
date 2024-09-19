@@ -1,13 +1,15 @@
+import Mesh from "./renderer/mesh.js";
 import ShaderProgram from "./renderer/webgl/shader-program.js";
 import Shader from "./renderer/webgl/shader.js";
 import Texture2D from "./renderer/webgl/texture2d.js";
 
 export const ASSET_TYPE_TEXTURE = 'texture';
 export const ASSET_TYPE_SHADER = 'shader';
+export const ASSET_TYPE_MESH = 'mesh';
 
 /**
  * @typedef {Object} Asset
- * @property {ASSET_TYPE_TEXTURE|ASSET_TYPE_SHADER} type
+ * @property {ASSET_TYPE_TEXTURE|ASSET_TYPE_SHADER|ASSET_TYPE_MESH} type
  * @property {string} name
  * @property {Object} metadata
  * @property {Object} data
@@ -57,6 +59,13 @@ export class AssetManager {
     }
 
     /**
+     * @param {string} name
+     */
+    registerMesh(name) {
+        return this.register(ASSET_TYPE_MESH, name);
+    }
+
+    /**
      * @param {string} type
      * @param {string} name
      */
@@ -84,6 +93,13 @@ export class AssetManager {
                 asset.loaded = true;
                 break;
 
+            case ASSET_TYPE_MESH:
+                const mesh = await Mesh.createFromObjUrl(this.context, `./assets/meshes/${name}`, asset.metadata);
+
+                asset.data = mesh;
+                asset.loaded = true;
+                break;
+
             default:
                 asset.loaded = true;
                 break;
@@ -104,6 +120,13 @@ export class AssetManager {
      */
     loadShader(name) {
         return this.load(ASSET_TYPE_SHADER, name);
+    }
+
+    /**
+     * @param {string} name
+     */
+    loadMesh(name) {
+        return this.load(ASSET_TYPE_MESH, name);
     }
 
     /**
@@ -133,6 +156,13 @@ export class AssetManager {
      */
     getShader(name) {
         return this.get(ASSET_TYPE_SHADER, name);
+    }
+
+    /**
+     * @param {string} name
+     */
+    getMesh(name) {
+        return this.get(ASSET_TYPE_MESH, name);
     }
 }
 

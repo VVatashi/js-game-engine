@@ -13,5 +13,23 @@
         "type": "shader",
         "name": "screen",
         "metadata": {}
+    },
+    {
+        "type": "mesh",
+        "name": "quad.obj",
+        "metadata": {
+            "positionElements": 2,
+            "texCoordElements": 2,
+            "normalElements": false
+        }
+    },
+    {
+        "type": "mesh",
+        "name": "teapot.obj",
+        "metadata": {
+            "positionElements": 3,
+            "texCoordElements": 2,
+            "normalElements": 3
+        }
     }
 ]

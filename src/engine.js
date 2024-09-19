@@ -25,14 +25,12 @@ export class Engine {
         this.multisampleRenderPass = new MultisampleRenderPass(this.renderer.context, this.canvas.width, this.canvas.height);
 
         fetch('./assets/assets.json').then(async response => {
+            /** @type {import('./asset-manager.js').Asset[]} */
             const assets = await response.json();
             for (const asset of assets)
                 this.assetManager.register(asset.type, asset.name, asset.metadata);
 
-            await Promise.all(assets.map(asset => {
-                console.log(`Loading ${asset.type} ${asset.name}`);
-                return this.assetManager.load(asset.type, asset.name);
-            }));
+            await Promise.all(assets.map(asset => this.assetManager.load(asset.type, asset.name)));
 
             console.log('Assets loaded');
         });
@@ -52,22 +50,6 @@ export class Engine {
             const texCoords = { index: 1, elements: 2, type: this.renderer.context.FLOAT, normalized: false, stride: 8 * Float32Array.BYTES_PER_ELEMENT, offset: 2 * Float32Array.BYTES_PER_ELEMENT };
             const color = { index: 2, elements: 4, type: this.renderer.context.FLOAT, normalized: false, stride: 8 * Float32Array.BYTES_PER_ELEMENT, offset: 4 * Float32Array.BYTES_PER_ELEMENT };
             this.vertexArray = new VertexArray(this.renderer.context).attachBuffer(this.vertexBuffer, position, texCoords, color);
-        }
-
-        this.screenVertexBuffer = new VertexBuffer(this.renderer.context, this.renderer.context.ARRAY_BUFFER, new Float32Array([
-            -1, -1, 0, 0,
-            -1, 1, 0, 1,
-            1, 1, 1, 1,
-
-            -1, -1, 0, 0,
-            1, 1, 1, 1,
-            1, -1, 1, 0,
-        ]));
-
-        {
-            const position = { index: 0, elements: 2, type: this.renderer.context.FLOAT, normalized: false, stride: 4 * Float32Array.BYTES_PER_ELEMENT, offset: 0 };
-            const texCoords = { index: 1, elements: 2, type: this.renderer.context.FLOAT, normalized: false, stride: 4 * Float32Array.BYTES_PER_ELEMENT, offset: 2 * Float32Array.BYTES_PER_ELEMENT };
-            this.screenVertexArray = new VertexArray(this.renderer.context).attachBuffer(this.screenVertexBuffer, position, texCoords);
         }
 
         /** @type {GameObject[]} */
@@ -146,15 +128,13 @@ export class Engine {
     draw(deltaTime) {
         this.multisampleRenderPass.begin();
         {
-            this.renderer.clear();
-
             const shaderProgram = this.assetManager.getShader('simple');
             if (shaderProgram !== null) {
                 shaderProgram.bind()
                     .setUniformMatrix('matrix', this.matrix)
                     .setUniformInteger('colorTexture', 0);
 
-                this.assetManager.getTexture('1.png').bind();
+                this.assetManager.getTexture('1.png')?.bind();
                 this.vertexArray.draw(6);
             }
 
@@ -169,7 +149,7 @@ export class Engine {
                 .setUniformInteger('colorTexture', 0);
 
             this.multisampleRenderPass.attachment?.bind(0);
-            this.screenVertexArray.draw(6);
+            this.assetManager.getMesh('quad.obj')?.draw();
         }
     }
 }
