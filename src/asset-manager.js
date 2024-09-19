@@ -141,6 +141,7 @@ export class AssetManager {
 
     /**
      * @param {string} name
+     * @return {Texture2D}
      */
     getTexture(name) {
         return this.get(ASSET_TYPE_TEXTURE, name);
@@ -148,6 +149,7 @@ export class AssetManager {
 
     /**
      * @param {string} name
+     * @return {Shader}
      */
     getShader(name) {
         return this.get(ASSET_TYPE_SHADER, name);
@@ -155,6 +157,7 @@ export class AssetManager {
 
     /**
      * @param {string} name
+     * @return {Mesh}
      */
     getMesh(name) {
         return this.get(ASSET_TYPE_MESH, name);

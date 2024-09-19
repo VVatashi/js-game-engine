@@ -24,9 +24,9 @@ export class Texture2D {
             minFilter: true,
             magFilter: true,
             mipFilter: true,
-            wrap: context.CLAMP_TO_EDGE,
-            wrapS: context.CLAMP_TO_EDGE,
-            wrapT: context.CLAMP_TO_EDGE,
+            wrap: context.REPEAT,
+            wrapS: context.REPEAT,
+            wrapT: context.REPEAT,
             ...options,
         };
 
