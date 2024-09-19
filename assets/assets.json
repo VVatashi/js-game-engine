@@ -1,0 +1,17 @@
+[
+    {
+        "type": "texture",
+        "name": "1.png",
+        "metadata": {}
+    },
+    {
+        "type": "shader",
+        "name": "simple",
+        "metadata": {}
+    },
+    {
+        "type": "shader",
+        "name": "screen",
+        "metadata": {}
+    }
+]

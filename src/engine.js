@@ -1,10 +1,9 @@
+import AssetManager from './asset-manager.js';
 import Renderer from './renderer/renderer.js';
 import Framebuffer from './renderer/webgl/framebuffer.js';
 import Renderbuffer from './renderer/webgl/renderbuffer.js';
-import ShaderProgram from './renderer/webgl/shader-program.js';
-import Shader from './renderer/webgl/shader.js';
 import Texture2D from './renderer/webgl/texture2d.js';
-import VertexArray, { VertexAttribute } from './renderer/webgl/vertex-array.js';
+import VertexArray from './renderer/webgl/vertex-array.js';
 import VertexBuffer from './renderer/webgl/vertex-buffer.js';
 
 const FIXED_UPDATE_TIMESTEP = 60 / 1000;
@@ -24,6 +23,7 @@ export class Engine {
     constructor(canvas) {
         this.canvas = canvas;
         this.renderer = new Renderer(canvas);
+        this.assetManager = new AssetManager(this.renderer.context);
 
         this.framebufferMultisample = new Framebuffer(this.renderer.context, this.canvas.width, this.canvas.height);
         this.framebuffer = new Framebuffer(this.renderer.context, this.canvas.width, this.canvas.height);
@@ -34,23 +34,18 @@ export class Engine {
         /** @type {Texture2D|null} */
         this.framebufferTexture = null;
 
-        /** @type {Texture2D|null} */
-        this.texture = null;
-        Texture2D.createFromImageUrl(this.renderer.context, './assets/images/1.png').then(texture => this.texture = texture);
+        fetch('./assets/assets.json').then(async response => {
+            const assets = await response.json();
+            for (const asset of assets)
+                this.assetManager.register(asset.type, asset.name, asset.metadata);
 
-        /** @type {ShaderProgram|null} */
-        this.shaderProgram = null;
-        Promise.all([
-            Shader.createFromUrl(this.renderer.context, this.renderer.context.VERTEX_SHADER, './assets/shaders/simple.vert'),
-            Shader.createFromUrl(this.renderer.context, this.renderer.context.FRAGMENT_SHADER, './assets/shaders/simple.frag'),
-        ]).then(shaders => this.shaderProgram = new ShaderProgram(this.renderer.context, ...shaders));
+            await Promise.all(assets.map(asset => {
+                console.log(`Loading ${asset.type} ${asset.name}`);
+                return this.assetManager.load(asset.type, asset.name);
+            }));
 
-        /** @type {ShaderProgram|null} */
-        this.screenShaderProgram = null;
-        Promise.all([
-            Shader.createFromUrl(this.renderer.context, this.renderer.context.VERTEX_SHADER, './assets/shaders/screen.vert'),
-            Shader.createFromUrl(this.renderer.context, this.renderer.context.FRAGMENT_SHADER, './assets/shaders/screen.frag'),
-        ]).then(shaders => this.screenShaderProgram = new ShaderProgram(this.renderer.context, ...shaders));
+            console.log('Assets loaded');
+        });
 
         this.vertexBuffer = new VertexBuffer(this.renderer.context, this.renderer.context.ARRAY_BUFFER, new Float32Array([
             0, 0, 0, 0, 1, 1, 1, 1,
@@ -63,9 +58,9 @@ export class Engine {
         ]));
 
         {
-            const position = new VertexAttribute(0, 2, this.renderer.context.FLOAT, false, 8 * Float32Array.BYTES_PER_ELEMENT, 0);
-            const texCoords = new VertexAttribute(1, 2, this.renderer.context.FLOAT, false, 8 * Float32Array.BYTES_PER_ELEMENT, 2 * Float32Array.BYTES_PER_ELEMENT);
-            const color = new VertexAttribute(2, 4, this.renderer.context.FLOAT, false, 8 * Float32Array.BYTES_PER_ELEMENT, 4 * Float32Array.BYTES_PER_ELEMENT);
+            const position = { index: 0, elements: 2, type: this.renderer.context.FLOAT, normalized: false, stride: 8 * Float32Array.BYTES_PER_ELEMENT, offset: 0 };
+            const texCoords = { index: 1, elements: 2, type: this.renderer.context.FLOAT, normalized: false, stride: 8 * Float32Array.BYTES_PER_ELEMENT, offset: 2 * Float32Array.BYTES_PER_ELEMENT };
+            const color = { index: 2, elements: 4, type: this.renderer.context.FLOAT, normalized: false, stride: 8 * Float32Array.BYTES_PER_ELEMENT, offset: 4 * Float32Array.BYTES_PER_ELEMENT };
             this.vertexArray = new VertexArray(this.renderer.context).attachBuffer(this.vertexBuffer, position, texCoords, color);
         }
 
@@ -80,8 +75,8 @@ export class Engine {
         ]));
 
         {
-            const position = new VertexAttribute(0, 2, this.renderer.context.FLOAT, false, 4 * Float32Array.BYTES_PER_ELEMENT, 0);
-            const texCoords = new VertexAttribute(1, 2, this.renderer.context.FLOAT, false, 4 * Float32Array.BYTES_PER_ELEMENT, 2 * Float32Array.BYTES_PER_ELEMENT);
+            const position = { index: 0, elements: 2, type: this.renderer.context.FLOAT, normalized: false, stride: 4 * Float32Array.BYTES_PER_ELEMENT, offset: 0 };
+            const texCoords = { index: 1, elements: 2, type: this.renderer.context.FLOAT, normalized: false, stride: 4 * Float32Array.BYTES_PER_ELEMENT, offset: 2 * Float32Array.BYTES_PER_ELEMENT };
             this.screenVertexArray = new VertexArray(this.renderer.context).attachBuffer(this.screenVertexBuffer, position, texCoords);
         }
 
@@ -169,11 +164,13 @@ export class Engine {
         this.framebufferMultisample.bind();
         this.renderer.clear();
 
-        if (this.shaderProgram !== null) {
-            this.shaderProgram.bind()
+        const shaderProgram = this.assetManager.getShader('simple');
+        if (shaderProgram !== null) {
+            shaderProgram.bind()
                 .setUniformMatrix('matrix', this.matrix)
                 .setUniformInteger('colorTexture', 0);
-            this.texture?.bind();
+
+            this.assetManager.getTexture('1.png').bind();
             this.vertexArray.draw(6);
         }
 
@@ -183,9 +180,11 @@ export class Engine {
         this.framebufferMultisample.unbind();
         this.framebufferMultisample.blitTo(this.framebuffer);
 
-        if (this.screenShaderProgram !== null) {
-            this.screenShaderProgram.bind()
+        const screenShaderProgram = this.assetManager.getShader('screen');
+        if (screenShaderProgram !== null) {
+            screenShaderProgram.bind()
                 .setUniformInteger('colorTexture', 0);
+
             this.framebufferTexture.bind();
             this.screenVertexArray.draw(6);
         }

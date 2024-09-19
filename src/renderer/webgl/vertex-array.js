@@ -1,21 +1,12 @@
-export class VertexAttribute {
-    /**
-     * @param {number} index
-     * @param {number} elements
-     * @param {number} type
-     * @param {boolean} normalized
-     * @param {number} stride
-     * @param {number} offset
-     */
-    constructor(index, elements, type, normalized, stride, offset) {
-        this.index = index;
-        this.elements = elements;
-        this.type = type;
-        this.normalized = normalized;
-        this.stride = stride;
-        this.offset = offset;
-    }
-}
+/**
+ * @typedef {Object} VertexAttribute
+ * @property {number} index
+ * @property {number} elements
+ * @property {number} type
+ * @property {boolean} normalized
+ * @property {number} stride
+ * @property {number} offset
+ */
 
 export class VertexArray {
     /**
