@@ -4,4 +4,4 @@ function main() {
     window.engine = new Engine(document.getElementById('canvas'));
 }
 
-(document.readyState === 'loading') ? document.addEventListener('DOMContentLoaded', main) : main();
+document.readyState === 'loading' ? document.addEventListener('DOMContentLoaded', main) : main();

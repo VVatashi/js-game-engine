@@ -7,8 +7,7 @@ export class ShaderProgram {
      */
     constructor(context, ...shaders) {
         const handle = context.createProgram();
-        for (const shader of shaders)
-            context.attachShader(handle, shader.handle);
+        for (const shader of shaders) context.attachShader(handle, shader.handle);
 
         context.linkProgram(handle);
         if (!context.getProgramParameter(handle, context.LINK_STATUS)) {
@@ -44,10 +43,9 @@ export class ShaderProgram {
 
     getUniformLocation(name) {
         const { context, handle, uniformLocationCache } = this;
-        if (name in uniformLocationCache)
-            return uniformLocationCache[name];
+        if (name in uniformLocationCache) return uniformLocationCache[name];
 
-        return uniformLocationCache[name] = context.getUniformLocation(handle, name);
+        return (uniformLocationCache[name] = context.getUniformLocation(handle, name));
     }
 
     setUniformInteger(name, value) {
@@ -55,10 +53,8 @@ export class ShaderProgram {
         this.bind();
 
         const location = this.getUniformLocation(name);
-        if (typeof value === 'boolean')
-            context.uniform1i(location, value ? 1 : 0);
-        else
-            context.uniform1i(location, value);
+        if (typeof value === 'boolean') context.uniform1i(location, value ? 1 : 0);
+        else context.uniform1i(location, value);
 
         return this;
     }

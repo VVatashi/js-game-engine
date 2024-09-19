@@ -1,5 +1,5 @@
-import VertexArray from "./webgl/vertex-array.js";
-import VertexBuffer from "./webgl/vertex-buffer.js";
+import VertexArray from './webgl/vertex-array.js';
+import VertexBuffer from './webgl/vertex-buffer.js';
 
 export class Mesh {
     /**
@@ -8,8 +8,7 @@ export class Mesh {
      * @param {VertexAttribute[]} attributes
      */
     constructor(context, vertexData, ...attributes) {
-        if (attributes.length === 0)
-            throw new Error('At least one vertex attribute is required');
+        if (attributes.length === 0) throw new Error('At least one vertex attribute is required');
 
         this.context = context;
 
@@ -56,28 +55,18 @@ export class Mesh {
                     break;
 
                 case 'vn':
-                    if (Number(options.normalElements) > 0)
-                        normals.push(values.slice(0, options.normalElements).map(Number.parseFloat));
+                    if (Number(options.normalElements) > 0) normals.push(values.slice(0, options.normalElements).map(Number.parseFloat));
                     break;
 
                 case 'f':
-                    const indexes = values.length === 3
-                        ? [0, 1, 2]
-                        : (values.length === 4
-                            ? [0, 1, 2, 0, 2, 3]
-                            : []);
+                    const indexes = values.length === 3 ? [0, 1, 2] : values.length === 4 ? [0, 1, 2, 0, 2, 3] : [];
 
                     for (const index of indexes) {
                         const [vertexIndex, texCoordIndex, normalIndex] = values[index].split('/');
 
-                        if (Number(options.positionElements) > 0)
-                            vertexData.push(...vertices[vertexIndex - 1]);
-
-                        if (Number(options.texCoordElements) > 0)
-                            vertexData.push(...texCoords[texCoordIndex - 1]);
-
-                        if (Number(options.normalElements) > 0)
-                            vertexData.push(...normals[normalIndex - 1]);
+                        if (Number(options.positionElements) > 0) vertexData.push(...vertices[vertexIndex - 1]);
+                        if (Number(options.texCoordElements) > 0) vertexData.push(...texCoords[texCoordIndex - 1]);
+                        if (Number(options.normalElements) > 0) vertexData.push(...normals[normalIndex - 1]);
                     }
                     break;
             }
@@ -90,10 +79,24 @@ export class Mesh {
             attributes.push({ index: 0, elements: options.positionElements, type: context.FLOAT, normalized: false, stride, offset: 0 });
 
         if (options.texCoordElements > 0)
-            attributes.push({ index: 1, elements: options.texCoordElements, type: context.FLOAT, normalized: false, stride, offset: options.positionElements * Float32Array.BYTES_PER_ELEMENT });
+            attributes.push({
+                index: 1,
+                elements: options.texCoordElements,
+                type: context.FLOAT,
+                normalized: false,
+                stride,
+                offset: options.positionElements * Float32Array.BYTES_PER_ELEMENT,
+            });
 
         if (options.normalElements > 0)
-            attributes.push({ index: 2, elements: options.normalElements, type: context.FLOAT, normalized: false, stride, offset: (options.positionElements + options.texCoordElements) * Float32Array.BYTES_PER_ELEMENT });
+            attributes.push({
+                index: 2,
+                elements: options.normalElements,
+                type: context.FLOAT,
+                normalized: false,
+                stride,
+                offset: (options.positionElements + options.texCoordElements) * Float32Array.BYTES_PER_ELEMENT,
+            });
 
         return new Mesh(context, new Float32Array(vertexData), ...attributes);
     }

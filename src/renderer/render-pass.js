@@ -1,6 +1,6 @@
-import Framebuffer from "./webgl/framebuffer.js";
-import Renderbuffer from "./webgl/renderbuffer.js";
-import Texture2D from "./webgl/texture2d.js";
+import Framebuffer from './webgl/framebuffer.js';
+import Renderbuffer from './webgl/renderbuffer.js';
+import Texture2D from './webgl/texture2d.js';
 
 export class RenderPass {
     constructor(context, width, height) {

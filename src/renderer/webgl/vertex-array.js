@@ -42,7 +42,14 @@ export class VertexArray {
         buffer.bind();
         for (const vertexAttribute of vertexAttributes) {
             context.enableVertexAttribArray(vertexAttribute.index);
-            context.vertexAttribPointer(vertexAttribute.index, vertexAttribute.elements, vertexAttribute.type, vertexAttribute.normalized, vertexAttribute.stride, vertexAttribute.offset);
+            context.vertexAttribPointer(
+                vertexAttribute.index,
+                vertexAttribute.elements,
+                vertexAttribute.type,
+                vertexAttribute.normalized,
+                vertexAttribute.stride,
+                vertexAttribute.offset
+            );
         }
 
         this.unbind();

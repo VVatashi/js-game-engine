@@ -1,7 +1,7 @@
-import Mesh from "./renderer/mesh.js";
-import ShaderProgram from "./renderer/webgl/shader-program.js";
-import Shader from "./renderer/webgl/shader.js";
-import Texture2D from "./renderer/webgl/texture2d.js";
+import Mesh from './renderer/mesh.js';
+import ShaderProgram from './renderer/webgl/shader-program.js';
+import Shader from './renderer/webgl/shader.js';
+import Texture2D from './renderer/webgl/texture2d.js';
 
 export const ASSET_TYPE_TEXTURE = 'texture';
 export const ASSET_TYPE_SHADER = 'shader';
@@ -32,8 +32,7 @@ export class AssetManager {
      * @param {Object} metadata
      */
     register(type, name, metadata = {}) {
-        if (!(type in this.assets))
-            this.assets[type] = {};
+        if (!(type in this.assets)) this.assets[type] = {};
 
         this.assets[type][name] = {
             type,
@@ -70,12 +69,10 @@ export class AssetManager {
      * @param {string} name
      */
     async load(type, name) {
-        if (!(type in this.assets) || !(name in this.assets[type]))
-            return null;
+        if (!(type in this.assets) || !(name in this.assets[type])) return null;
 
         const asset = this.assets[type][name];
-        if (asset.loaded)
-            return asset;
+        if (asset.loaded) return asset;
 
         switch (type) {
             case ASSET_TYPE_TEXTURE:
@@ -134,12 +131,10 @@ export class AssetManager {
      * @param {string} name
      */
     get(type, name) {
-        if (!(type in this.assets) || !(name in this.assets[type]))
-            return null;
+        if (!(type in this.assets) || !(name in this.assets[type])) return null;
 
         const asset = this.assets[type][name];
-        if (!asset.loaded)
-            return null;
+        if (!asset.loaded) return null;
 
         return asset.data;
     }

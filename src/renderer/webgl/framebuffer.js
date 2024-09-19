@@ -87,7 +87,18 @@ export class Framebuffer {
         options = { mask: context.COLOR_BUFFER_BIT, filter: true, ...options };
         context.bindFramebuffer(context.READ_FRAMEBUFFER, this.handle);
         context.bindFramebuffer(context.DRAW_FRAMEBUFFER, framebuffer.handle);
-        context.blitFramebuffer(0, 0, width, height, 0, 0, framebuffer.width, framebuffer.height, options.mask, options.filter ? context.LINEAR : context.NEAREST);
+        context.blitFramebuffer(
+            0,
+            0,
+            width,
+            height,
+            0,
+            0,
+            framebuffer.width,
+            framebuffer.height,
+            options.mask,
+            options.filter ? context.LINEAR : context.NEAREST
+        );
         context.bindFramebuffer(context.READ_FRAMEBUFFER, null);
         context.bindFramebuffer(context.DRAW_FRAMEBUFFER, null);
 

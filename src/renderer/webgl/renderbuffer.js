@@ -12,9 +12,14 @@ export class Renderbuffer {
         const handle = context.createRenderbuffer();
         context.bindRenderbuffer(context.RENDERBUFFER, handle);
         if (options.multisample)
-            context.renderbufferStorageMultisample(context.RENDERBUFFER, context.getParameter(context.MAX_SAMPLES), options.internalFormat, width, height);
-        else
-            context.renderbufferStorage(context.RENDERBUFFER, options.internalFormat, width, height);
+            context.renderbufferStorageMultisample(
+                context.RENDERBUFFER,
+                context.getParameter(context.MAX_SAMPLES),
+                options.internalFormat,
+                width,
+                height
+            );
+        else context.renderbufferStorage(context.RENDERBUFFER, options.internalFormat, width, height);
 
         this.context = context;
         this.handle = handle;

@@ -38,9 +38,17 @@ export class Texture2D {
         context.bindTexture(context.TEXTURE_2D, handle);
         context.texImage2D(context.TEXTURE_2D, 0, options.internalFormat, width, height, 0, options.format, options.pixelType, null);
         context.texParameteri(context.TEXTURE_2D, context.TEXTURE_MAG_FILTER, options.magFilter ? context.LINEAR : context.NEAREST);
-        context.texParameteri(context.TEXTURE_2D, context.TEXTURE_MIN_FILTER, options.mipFilter
-            ? (options.minFilter ? context.LINEAR_MIPMAP_LINEAR : context.NEAREST_MIPMAP_LINEAR)
-            : (options.minFilter ? context.LINEAR : context.NEAREST));
+        context.texParameteri(
+            context.TEXTURE_2D,
+            context.TEXTURE_MIN_FILTER,
+            options.mipFilter
+                ? options.minFilter
+                    ? context.LINEAR_MIPMAP_LINEAR
+                    : context.NEAREST_MIPMAP_LINEAR
+                : options.minFilter
+                ? context.LINEAR
+                : context.NEAREST
+        );
         context.texParameteri(context.TEXTURE_2D, context.TEXTURE_WRAP_S, wrapS);
         context.texParameteri(context.TEXTURE_2D, context.TEXTURE_WRAP_T, wrapT);
 
@@ -90,7 +98,7 @@ export class Texture2D {
         return new Promise((resolve, reject) => {
             const image = new Image();
             image.addEventListener('load', () => resolve(Texture2D.createFromImage(context, image, options)));
-            image.addEventListener('error', e => reject(e));
+            image.addEventListener('error', (e) => reject(e));
             image.loading = 'eager';
             image.src = url;
         });
@@ -111,8 +119,7 @@ export class Texture2D {
         const { context } = this;
         this.bind();
         context.texSubImage2D(context.TEXTURE_2D, 0, 0, 0, this.format, this.pixelType, image);
-        if (this.mipFilter)
-            context.generateMipmap(context.TEXTURE_2D);
+        if (this.mipFilter) context.generateMipmap(context.TEXTURE_2D);
 
         return this;
     }
