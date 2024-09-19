@@ -1,8 +1,6 @@
 import AssetManager from './asset-manager.js';
+import { MultisampleRenderPass } from './renderer/render-pass.js';
 import Renderer from './renderer/renderer.js';
-import Framebuffer from './renderer/webgl/framebuffer.js';
-import Renderbuffer from './renderer/webgl/renderbuffer.js';
-import Texture2D from './renderer/webgl/texture2d.js';
 import VertexArray from './renderer/webgl/vertex-array.js';
 import VertexBuffer from './renderer/webgl/vertex-buffer.js';
 
@@ -24,15 +22,7 @@ export class Engine {
         this.canvas = canvas;
         this.renderer = new Renderer(canvas);
         this.assetManager = new AssetManager(this.renderer.context);
-
-        this.framebufferMultisample = new Framebuffer(this.renderer.context, this.canvas.width, this.canvas.height);
-        this.framebuffer = new Framebuffer(this.renderer.context, this.canvas.width, this.canvas.height);
-
-        /** @type {Renderbuffer|null} */
-        this.framebufferMultisampleRenderbuffer = null;
-
-        /** @type {Texture2D|null} */
-        this.framebufferTexture = null;
+        this.multisampleRenderPass = new MultisampleRenderPass(this.renderer.context, this.canvas.width, this.canvas.height);
 
         fetch('./assets/assets.json').then(async response => {
             const assets = await response.json();
@@ -139,14 +129,7 @@ export class Engine {
 
         this.matrix = this.createOrthographicOffCenter(0, this.canvas.width, this.canvas.height, 0, -1, 1);
 
-        this.framebufferMultisampleRenderbuffer?.delete();
-        this.framebufferMultisample.resize(this.canvas.width, this.canvas.height)
-            .attachRenderbuffer(this.framebufferMultisampleRenderbuffer = new Renderbuffer(this.renderer.context, this.canvas.width, this.canvas.height, { multisample: true }));
-
-        this.framebufferTexture?.delete();
-        this.framebuffer.resize(this.canvas.width, this.canvas.height)
-            .attachTexture2D(this.framebufferTexture = new Texture2D(this.renderer.context, this.canvas.width, this.canvas.height, { mipFilter: false }));
-
+        this.multisampleRenderPass.resize(this.canvas.width, this.canvas.height);
         this.renderer.resize();
     }
 
@@ -161,31 +144,31 @@ export class Engine {
     }
 
     draw(deltaTime) {
-        this.framebufferMultisample.bind();
-        this.renderer.clear();
+        this.multisampleRenderPass.begin();
+        {
+            this.renderer.clear();
 
-        const shaderProgram = this.assetManager.getShader('simple');
-        if (shaderProgram !== null) {
-            shaderProgram.bind()
-                .setUniformMatrix('matrix', this.matrix)
-                .setUniformInteger('colorTexture', 0);
+            const shaderProgram = this.assetManager.getShader('simple');
+            if (shaderProgram !== null) {
+                shaderProgram.bind()
+                    .setUniformMatrix('matrix', this.matrix)
+                    .setUniformInteger('colorTexture', 0);
 
-            this.assetManager.getTexture('1.png').bind();
-            this.vertexArray.draw(6);
+                this.assetManager.getTexture('1.png').bind();
+                this.vertexArray.draw(6);
+            }
+
+            for (const gameObject of this.gameObjects)
+                gameObject.draw(deltaTime);
         }
-
-        for (const gameObject of this.gameObjects)
-            gameObject.draw(deltaTime);
-
-        this.framebufferMultisample.unbind();
-        this.framebufferMultisample.blitTo(this.framebuffer);
+        this.multisampleRenderPass.end();
 
         const screenShaderProgram = this.assetManager.getShader('screen');
         if (screenShaderProgram !== null) {
             screenShaderProgram.bind()
                 .setUniformInteger('colorTexture', 0);
 
-            this.framebufferTexture.bind();
+            this.multisampleRenderPass.attachment?.bind(0);
             this.screenVertexArray.draw(6);
         }
     }
