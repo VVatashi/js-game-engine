@@ -1,69 +1,70 @@
 <!DOCTYPE html>
 <html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta
+            name="viewport"
+            content="width=device-width, initial-scale=1, maximum-scale=1"
+        />
+        <meta name="mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
 
-<head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
-    <meta name="mobile-web-app-capable" content="yes" />
-    <meta name="apple-mobile-web-app-capable" content="yes" />
+        <title>Game</title>
 
-    <title>Game</title>
+        <script type="importmap">
+            {
+                "imports": {
+                    "/node_modules/@vvatashi/js-vec-math/node_modules/": "/node_modules/"
+                }
+            }
+        </script>
 
-    <script type="importmap">
-{
-    "imports": {
-        "/node_modules/@vvatashi/js-vec-math/node_modules/": "/node_modules/"
-    }
-}
-    </script>
+        <script src="./src/index.js" async type="module"></script>
 
-    <script src="./src/index.js" async type="module"></script>
+        <style>
+            html {
+                box-sizing: border-box;
+                user-select: none;
+                touch-action: none;
+                overscroll-behavior: none;
+            }
 
-    <style>
-        html {
-            box-sizing: border-box;
-            user-select: none;
-            touch-action: none;
-            overscroll-behavior: none;
-        }
+            *,
+            *:before,
+            *:after {
+                box-sizing: inherit;
+            }
 
-        *,
-        *:before,
-        *:after {
-            box-sizing: inherit;
-        }
+            html,
+            body {
+                height: 100%;
+            }
 
-        html,
-        body {
-            height: 100%;
-        }
+            body {
+                margin: 0;
+                padding: 0;
+                background-color: transparent;
+                overscroll-behavior: contain;
+            }
 
-        body {
-            margin: 0;
-            padding: 0;
-            background-color: transparent;
-            overscroll-behavior: contain;
-        }
+            .container {
+                width: 100%;
+                height: 100%;
+                position: relative;
+            }
 
-        .container {
-            width: 100%;
-            height: 100%;
-            position: relative;
-        }
+            canvas {
+                display: block;
+                width: 100%;
+                height: 100%;
+                background: #000000;
+            }
+        </style>
+    </head>
 
-        canvas {
-            display: block;
-            width: 100%;
-            height: 100%;
-            background: #000000;
-        }
-    </style>
-</head>
-
-<body>
-    <div class="container" draggable="false">
-        <canvas class="canvas" id="canvas" draggable="false"></canvas>
-    </div>
-</body>
-
+    <body>
+        <div class="container" draggable="false">
+            <canvas class="canvas" id="canvas" draggable="false"></canvas>
+        </div>
+    </body>
 </html>

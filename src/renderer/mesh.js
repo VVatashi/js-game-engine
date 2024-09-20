@@ -59,7 +59,7 @@ export class Mesh {
                     break;
 
                 case 'f':
-                    const indexes = values.length === 3 ? [0, 1, 2] : values.length === 4 ? [0, 1, 2, 0, 2, 3] : [];
+                    const indexes = values.length === 3 ? [0, 2, 1] : values.length === 4 ? [0, 2, 1, 0, 3, 2] : [];
 
                     for (const index of indexes) {
                         const [vertexIndex, texCoordIndex, normalIndex] = values[index].split('/');

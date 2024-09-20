@@ -11,12 +11,17 @@
     },
     {
         "type": "texture",
+        "name": "Face_tex_002_toObj.png",
+        "metadata": {}
+    },
+    {
+        "type": "texture",
         "name": "Hair_tex_001.png",
         "metadata": {}
     },
     {
         "type": "texture",
-        "name": "Face_tex_002_toObj.png",
+        "name": "white.png",
         "metadata": {}
     },
     {
@@ -28,24 +33,6 @@
         "type": "shader",
         "name": "screen",
         "metadata": {}
-    },
-    {
-        "type": "mesh",
-        "name": "quad.obj",
-        "metadata": {
-            "positionElements": 2,
-            "texCoordElements": 2,
-            "normalElements": false
-        }
-    },
-    {
-        "type": "mesh",
-        "name": "teapot.obj",
-        "metadata": {
-            "positionElements": 3,
-            "texCoordElements": 2,
-            "normalElements": 3
-        }
     },
     {
         "type": "mesh",
@@ -68,6 +55,24 @@
     {
         "type": "mesh",
         "name": "Elf01_hair.obj",
+        "metadata": {
+            "positionElements": 3,
+            "texCoordElements": 2,
+            "normalElements": 3
+        }
+    },
+    {
+        "type": "mesh",
+        "name": "quad.obj",
+        "metadata": {
+            "positionElements": 2,
+            "texCoordElements": 2,
+            "normalElements": false
+        }
+    },
+    {
+        "type": "mesh",
+        "name": "teapot.obj",
         "metadata": {
             "positionElements": 3,
             "texCoordElements": 2,

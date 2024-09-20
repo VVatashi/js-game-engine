@@ -4,17 +4,18 @@ import { MultisampleRenderPass } from './renderer/render-pass.js';
 import Renderer from './renderer/renderer.js';
 import SpriteBatch from './renderer/sprite-batch.js';
 import Matrix4 from './matrix4.js';
+import VectorRenderer from './renderer/vector-renderer.js';
 
 const FIXED_UPDATE_TIMESTEP = 60 / 1000;
 
 export class GameObject {
-    constructor() { }
+    constructor() {}
 
-    fixedUpdate(deltaTime) { }
+    fixedUpdate(deltaTime) {}
 
-    update(deltaTime) { }
+    update(deltaTime) {}
 
-    draw(deltaTime) { }
+    draw(deltaTime) {}
 }
 
 export class Engine {
@@ -26,17 +27,10 @@ export class Engine {
         this.inputManager = new InputManager();
         this.multisampleRenderPass = new MultisampleRenderPass(this.renderer.context, this.canvas.width, this.canvas.height);
         this.spriteBatch = new SpriteBatch(this.renderer.context);
+        this.vectorRenderer = new VectorRenderer(this.renderer.context);
 
-        this.time = 0;
-
-        this.offsetX = 0;
-        this.offsetY = 0;
-
-        this.startX = 0;
-        this.startY = 0;
-
-        this.startMouseX = 0;
-        this.startMouseY = 0;
+        this.linecap = 'bevel';
+        this.loop = false;
 
         fetch('./assets/assets.json').then(async (response) => {
             /** @type {import('./asset-manager.js').Asset[]} */
@@ -58,6 +52,8 @@ export class Engine {
         let timeSinceFixedUpdate = 0;
 
         const requestAnimationFrameCallback = (timestamp) => {
+            requestAnimationFrame(requestAnimationFrameCallback);
+
             timestamp /= 1000;
 
             const deltaTime = timestamp - currentTime;
@@ -71,8 +67,6 @@ export class Engine {
 
             this.update(deltaTime);
             this.draw(deltaTime);
-
-            requestAnimationFrame(requestAnimationFrameCallback);
         };
 
         requestAnimationFrame(requestAnimationFrameCallback);
@@ -82,7 +76,7 @@ export class Engine {
         this.canvas.width = document.documentElement.clientWidth * devicePixelRatio;
         this.canvas.height = document.documentElement.clientHeight * devicePixelRatio;
 
-        this.projectionMatrix = Matrix4.createOrthographicOffCenter(1, -1, -1, 1, -1, 1);
+        this.projectionMatrix = Matrix4.createOrthographicOffCenter(0, this.canvas.width, this.canvas.height, 0, -1, 1);
 
         this.multisampleRenderPass.resize(this.canvas.width, this.canvas.height);
         this.renderer.resize();
@@ -95,50 +89,66 @@ export class Engine {
     update(deltaTime) {
         for (const gameObject of this.gameObjects) gameObject.update(deltaTime);
 
-        this.time += deltaTime;
-
         if (this.inputManager.leftMouseButtonPressed) {
-            this.startX = this.offsetX;
-            this.startY = this.offsetY;
-
-            this.startMouseX = this.inputManager.mouseX;
-            this.startMouseY = this.inputManager.mouseY;
+            if (this.linecap === false) this.linecap = 'bevel';
+            else this.linecap = false;
         }
 
-        if (this.inputManager.leftMouseButtonDown) {
-            this.offsetX = this.startX + (this.inputManager.mouseX - this.startMouseX);
-            this.offsetY = this.startY + (this.inputManager.mouseY - this.startMouseY);
+        if (this.inputManager.rightMouseButtonPressed) {
+            if (this.loop) this.loop = false;
+            else this.loop = true;
         }
 
         this.inputManager.resetPressedButtons();
     }
 
     draw(deltaTime) {
+        this.time = (this.time || 0) + deltaTime;
+
         this.multisampleRenderPass.begin();
         {
             this.renderer.clear();
 
             const shaderProgram = this.assetManager.getShader('simple');
             if (shaderProgram !== null) {
-                let matrix = Matrix4.multiply(
-                    Matrix4.createScale(0.02),
-                    Matrix4.multiply(
-                        Matrix4.createTranslation(0.06, 0, 0.06),
-                        Matrix4.multiply(
-                            Matrix4.createRotationY(this.time),
-                            Matrix4.createTranslation(-this.offsetX / this.canvas.width * 2, -this.offsetY / this.canvas.height * 2, 0),
-                        )
+                shaderProgram.bind().setUniformMatrix('projectionMatrix', this.projectionMatrix).setUniformInteger('colorTexture', 0);
+                this.assetManager.getTexture('white.png')?.bind();
+                this.vectorRenderer
+                    .begin()
+                    .drawLineStrip(
+                        [
+                            [100, 100],
+                            [200, 100],
+                        ],
+                        { width: 10, loop: this.loop, linecap: this.linecap }
                     )
-                );
-
-                shaderProgram.bind().setUniformMatrix('modelMatrix', matrix).setUniformMatrix('projectionMatrix', this.projectionMatrix).setUniformInteger('colorTexture', 0);
-                this.renderer.context.frontFace(this.renderer.context.CW);
-                this.assetManager.getTexture('Body_tex_003.png')?.bind();
-                this.assetManager.getMesh('Elf01_body.obj')?.draw();
-                this.assetManager.getTexture('Face_tex_002_toObj.png')?.bind();
-                this.assetManager.getMesh('Elf01_face.obj')?.draw();
-                this.assetManager.getTexture('Hair_tex_001.png')?.bind();
-                this.assetManager.getMesh('Elf01_hair.obj')?.draw();
+                    .drawLineStrip(
+                        [
+                            [200, 200],
+                            [200, 400],
+                            [400, 400],
+                            [400 + 150 * Math.sin(this.time), 200 + 150 * Math.cos(this.time)],
+                        ],
+                        { width: 20, loop: this.loop, linecap: this.linecap }
+                    )
+                    .drawLineStrip(
+                        [
+                            [300 + 200, 200],
+                            [300 + 400, 200],
+                            [300 + 400 + 250 * Math.sin(this.time), 400 + 150 * Math.cos(this.time)],
+                            [300 + 200, 400],
+                        ],
+                        { width: 10, loop: this.loop, linecap: this.linecap, g: 0, b: 0 }
+                    )
+                    .drawLineStrip(
+                        [
+                            [500, 450],
+                            [600 + 150 * Math.sin(this.time), 600 + 150 * Math.cos(this.time)],
+                            [400, 600],
+                        ],
+                        { width: 5, loop: this.loop, linecap: this.linecap }
+                    )
+                    .end();
 
                 for (const gameObject of this.gameObjects) gameObject.draw(deltaTime);
             }
@@ -151,7 +161,6 @@ export class Engine {
             screenShaderProgram.bind().setUniformInteger('colorTexture', 0);
 
             this.multisampleRenderPass.attachment?.bind(0);
-            this.renderer.context.frontFace(this.renderer.context.CCW);
             this.assetManager.getMesh('quad.obj')?.draw();
         }
     }

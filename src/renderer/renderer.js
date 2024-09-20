@@ -8,7 +8,7 @@ export class Renderer {
         this.context.frontFace(this.context.CCW);
 
         this.context.enable(this.context.DEPTH_TEST);
-        this.context.depthFunc(this.context.LESS);
+        this.context.depthFunc(this.context.LEQUAL);
 
         this.context.pixelStorei(this.context.UNPACK_FLIP_Y_WEBGL, true);
     }

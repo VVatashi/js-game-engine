@@ -37,20 +37,19 @@ export class SpriteBatch {
      * @param {number} width
      * @param {number} height
      * @param {Object} options
-     * @returns
      */
     drawRectangle(x, y, width, height, options = {}) {
         options = { r: 1, g: 1, b: 1, a: 1, ...options };
 
         // prettier-ignore
         this.vertexes.set([
-            x, y, 0, 0, options.r, options.g, options.b, options.a,
-            x + width, y + height, 1, 1, options.r, options.g, options.b, options.a,
-            x + width, y, 1, 0, options.r, options.g, options.b, options.a,
+            x, y, 0, 1, options.r, options.g, options.b, options.a,
+            x + width, y + height, 1, 0, options.r, options.g, options.b, options.a,
+            x + width, y, 1, 1, options.r, options.g, options.b, options.a,
 
-            x, y, 0, 0, options.r, options.g, options.b, options. a,
-            x, y + height, 0, 1, options.r, options.g, options.b, options.a,
-            x + width, y + height, 1, 1, options.r, options.g, options.b, options.a,
+            x, y, 0, 1, options.r, options.g, options.b, options. a,
+            x, y + height, 0, 0, options.r, options.g, options.b, options.a,
+            x + width, y + height, 1, 0, options.r, options.g, options.b, options.a,
         ], this.vertexCount * ELEMENTS_PER_VERTEX);
 
         this.vertexCount += 6;
