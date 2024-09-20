@@ -1,11 +1,11 @@
+import { CubicBezierSpline } from '../../node_modules/@vvatashi/js-splines/src/cubic-bezier-spline.js';
+import { bezierCurveN } from '../../node_modules/@vvatashi/js-splines/src/bezier-curve.js';
 import { Vec2 } from '../../node_modules/@vvatashi/js-vec-math/src/vec2.js';
 import VertexArray from './webgl/vertex-array.js';
 import VertexBuffer from './webgl/vertex-buffer.js';
 
 const MAX_VERTEX_DATA_LENGTH = 65535;
 const ELEMENTS_PER_VERTEX = 8;
-
-const DEFAULT_MITER_THRESHOLD = Math.cos((11 * Math.PI) / 180); // cos(11 deg)
 
 export class VectorRenderer {
     /**
@@ -76,7 +76,6 @@ export class VectorRenderer {
      * @param {number} options.width
      * @param {boolean} options.loop
      * @param {'bevel'|false|null} options.linecap
-     * @param {number} options.miterThreshold
      * @param {number} options.r
      * @param {number} options.g
      * @param {number} options.b
@@ -85,7 +84,7 @@ export class VectorRenderer {
     drawLineStrip(points, options = {}) {
         if (points.length < 2) return this;
 
-        options = { width: 1, r: 1, g: 1, b: 1, a: 1, loop: false, linecap: 'bevel', miterThreshold: DEFAULT_MITER_THRESHOLD, ...options };
+        options = { width: 1, r: 1, g: 1, b: 1, a: 1, loop: false, linecap: 'bevel', ...options };
 
         const halfWidth = options.width / 2;
 
@@ -200,6 +199,52 @@ export class VectorRenderer {
         }
 
         return this;
+    }
+
+    /**
+     * @param {Vec2[]|Float32Array[]|number[][]} points
+     * @param {Object} options
+     * @param {number} options.segments
+     * @param {number} options.width
+     * @param {'bevel'|false|null} options.linecap
+     * @param {number} options.r
+     * @param {number} options.g
+     * @param {number} options.b
+     * @param {number} options.a
+     */
+    drawBezierCurve(points, options = {}) {
+        if (points.length < 2) return this;
+
+        options = { segments: 24, width: 1, r: 1, g: 1, b: 1, a: 1, linecap: 'bevel', ...options };
+
+        const lineStripPoints = new Array(options.segments + 1);
+        for (let i = 0; i < options.segments + 1; i++) lineStripPoints[i] = bezierCurveN(points, i / options.segments);
+
+        return this.drawLineStrip(lineStripPoints, options);
+    }
+
+    /**
+     * @param {Vec2[]|Float32Array[]|number[][]} points
+     * @param {Object} options
+     * @param {number} options.segments
+     * @param {number} options.width
+     * @param {'bevel'|false|null} options.linecap
+     * @param {number} options.r
+     * @param {number} options.g
+     * @param {number} options.b
+     * @param {number} options.a
+     */
+    drawCubicBezierSpline(points, options = {}) {
+        if (points.length < 2) return this;
+
+        options = { segments: 24, width: 1, r: 1, g: 1, b: 1, a: 1, linecap: 'bevel', ...options };
+
+        const spline = new CubicBezierSpline(points);
+        const lineStripPoints = new Array(options.segments + 1);
+        for (let i = 0; i < options.segments + 1; i++)
+            lineStripPoints[i] = spline.getPointAt((spline.curves.length * i) / options.segments);
+
+        return this.drawLineStrip(lineStripPoints, options);
     }
 
     end() {

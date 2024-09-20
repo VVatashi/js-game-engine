@@ -118,35 +118,30 @@ export class Engine {
                     .drawLineStrip(
                         [
                             [100, 100],
-                            [200, 100],
-                        ],
-                        { width: 10, loop: this.loop, linecap: this.linecap }
-                    )
-                    .drawLineStrip(
-                        [
-                            [200, 200],
-                            [200, 400],
+                            [200 + 100 * Math.sin(this.time), 200 + 100 * Math.cos(this.time)],
+                            [300 - 200 * Math.sin(this.time / 3), 300 - 200 * Math.cos(this.time / 3)],
                             [400, 400],
-                            [400 + 150 * Math.sin(this.time), 200 + 150 * Math.cos(this.time)],
+
+                            [400, 400],
+                            [500 - 200 * Math.sin(this.time / 5), 500 - 200 * Math.cos(this.time / 5)],
+                            [600, 600],
+                            [700, 700],
                         ],
-                        { width: 20, loop: this.loop, linecap: this.linecap }
+                        { width: 2, loop: this.loop, linecap: this.linecap }
                     )
-                    .drawLineStrip(
+                    .drawCubicBezierSpline(
                         [
-                            [300 + 200, 200],
-                            [300 + 400, 200],
-                            [300 + 400 + 250 * Math.sin(this.time), 400 + 150 * Math.cos(this.time)],
-                            [300 + 200, 400],
+                            [100, 100],
+                            [200 + 100 * Math.sin(this.time), 200 + 100 * Math.cos(this.time)],
+                            [300 - 200 * Math.sin(this.time / 3), 300 - 200 * Math.cos(this.time / 3)],
+                            [400, 400],
+
+                            [400, 400],
+                            [500 - 200 * Math.sin(this.time / 5), 500 - 200 * Math.cos(this.time / 5)],
+                            [600, 600],
+                            [700, 700],
                         ],
-                        { width: 10, loop: this.loop, linecap: this.linecap, g: 0, b: 0 }
-                    )
-                    .drawLineStrip(
-                        [
-                            [500, 450],
-                            [600 + 150 * Math.sin(this.time), 600 + 150 * Math.cos(this.time)],
-                            [400, 600],
-                        ],
-                        { width: 5, loop: this.loop, linecap: this.linecap }
+                        { segments: 64, width: 4, loop: this.loop, linecap: this.linecap, r: 0 }
                     )
                     .end();
 
