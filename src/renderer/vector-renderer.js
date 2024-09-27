@@ -1,6 +1,6 @@
-import { CubicBezierSpline } from '../../node_modules/@vvatashi/js-splines/src/cubic-bezier-spline.js';
-import { bezierCurveN } from '../../node_modules/@vvatashi/js-splines/src/bezier-curve.js';
-import { Vec2 } from '../../node_modules/@vvatashi/js-vec-math/src/vec2.js';
+import { CubicBezierSpline } from '@vvatashi/js-splines/src/cubic-bezier-spline.js';
+import { bezierCurveN } from '@vvatashi/js-splines/src/bezier-curve.js';
+import { Vec2 } from '@vvatashi/js-vec-math/src/vec2.js';
 import VertexArray from './webgl/vertex-array.js';
 import VertexBuffer from './webgl/vertex-buffer.js';
 

@@ -15,6 +15,7 @@
     "test": "cross-env NODE_OPTIONS=\"$NODE_OPTIONS --experimental-vm-modules\" NODE_NO_WARNINGS=1 npx jest --passWithNoTests"
   },
   "dependencies": {
+    "@vvatashi/js-math-utils": "github:VVatashi/js-math-utils",
     "@vvatashi/js-splines": "github:VVatashi/js-splines",
     "@vvatashi/js-vec-math": "github:VVatashi/js-vec-math"
   }

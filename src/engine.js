@@ -5,6 +5,7 @@ import Renderer from './renderer/renderer.js';
 import SpriteBatch from './renderer/sprite-batch.js';
 import Matrix4 from './matrix4.js';
 import VectorRenderer from './renderer/vector-renderer.js';
+import { Vec4 } from '@vvatashi/js-vec-math/src/vec4.js';
 
 const FIXED_UPDATE_TIMESTEP = 60 / 1000;
 
@@ -28,9 +29,6 @@ export class Engine {
         this.multisampleRenderPass = new MultisampleRenderPass(this.renderer.context, this.canvas.width, this.canvas.height);
         this.spriteBatch = new SpriteBatch(this.renderer.context);
         this.vectorRenderer = new VectorRenderer(this.renderer.context);
-
-        this.linecap = 'bevel';
-        this.loop = false;
 
         fetch('./assets/assets.json').then(async (response) => {
             /** @type {import('./asset-manager.js').Asset[]} */
@@ -84,6 +82,9 @@ export class Engine {
             100
         );
 
+        this.inverseViewMatrix = this.viewMatrix.invert();
+        this.inverseProjectionMatrix = this.projectionMatrix.invert();
+
         this.multisampleRenderPass.resize(this.canvas.width, this.canvas.height);
         this.renderer.resize();
     }
@@ -94,16 +95,6 @@ export class Engine {
 
     update(deltaTime) {
         for (const gameObject of this.gameObjects) gameObject.update(deltaTime);
-
-        if (this.inputManager.leftMouseButtonPressed) {
-            if (this.linecap === false) this.linecap = 'bevel';
-            else this.linecap = false;
-        }
-
-        if (this.inputManager.rightMouseButtonPressed) {
-            if (this.loop) this.loop = false;
-            else this.loop = true;
-        }
 
         this.inputManager.resetPressedButtons();
     }
