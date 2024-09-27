@@ -26,6 +26,11 @@
     },
     {
         "type": "shader",
+        "name": "mesh",
+        "metadata": {}
+    },
+    {
+        "type": "shader",
         "name": "simple",
         "metadata": {}
     },
@@ -73,6 +78,15 @@
     {
         "type": "mesh",
         "name": "teapot.obj",
+        "metadata": {
+            "positionElements": 3,
+            "texCoordElements": 2,
+            "normalElements": 3
+        }
+    },
+    {
+        "type": "mesh",
+        "name": "Test_Level_1.obj",
         "metadata": {
             "positionElements": 3,
             "texCoordElements": 2,

@@ -149,7 +149,7 @@ export class AssetManager {
 
     /**
      * @param {string} name
-     * @return {Shader}
+     * @return {ShaderProgram}
      */
     getShader(name) {
         return this.get(ASSET_TYPE_SHADER, name);

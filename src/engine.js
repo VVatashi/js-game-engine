@@ -76,7 +76,13 @@ export class Engine {
         this.canvas.width = document.documentElement.clientWidth * devicePixelRatio;
         this.canvas.height = document.documentElement.clientHeight * devicePixelRatio;
 
-        this.projectionMatrix = Matrix4.createOrthographicOffCenter(0, this.canvas.width, this.canvas.height, 0, -1, 1);
+        this.viewMatrix = Matrix4.lookAt([15, 15, 15], [15, 0, 0], [0, 1, 0]);
+        this.projectionMatrix = Matrix4.createPerspectiveFieldOfView(
+            (80 * Math.PI) / 180,
+            this.canvas.width / this.canvas.height,
+            0.1,
+            100
+        );
 
         this.multisampleRenderPass.resize(this.canvas.width, this.canvas.height);
         this.renderer.resize();
@@ -109,41 +115,16 @@ export class Engine {
         {
             this.renderer.clear();
 
-            const shaderProgram = this.assetManager.getShader('simple');
+            const shaderProgram = this.assetManager.getShader('mesh');
             if (shaderProgram !== null) {
-                shaderProgram.bind().setUniformMatrix('projectionMatrix', this.projectionMatrix).setUniformInteger('colorTexture', 0);
+                shaderProgram
+                    .bind()
+                    .setUniformMatrix('projectionMatrix', this.projectionMatrix)
+                    .setUniformMatrix('viewMatrix', this.viewMatrix)
+                    .setUniformInteger('colorTexture', 0);
+
                 this.assetManager.getTexture('white.png')?.bind();
-                this.vectorRenderer
-                    .begin()
-                    .drawLineStrip(
-                        [
-                            [100, 100],
-                            [200 + 100 * Math.sin(this.time), 200 + 100 * Math.cos(this.time)],
-                            [300 - 200 * Math.sin(this.time / 3), 300 - 200 * Math.cos(this.time / 3)],
-                            [400, 400],
-
-                            [400, 400],
-                            [500 - 200 * Math.sin(this.time / 5), 500 - 200 * Math.cos(this.time / 5)],
-                            [600, 600],
-                            [700, 700],
-                        ],
-                        { width: 2, loop: this.loop, linecap: this.linecap }
-                    )
-                    .drawCubicBezierSpline(
-                        [
-                            [100, 100],
-                            [200 + 100 * Math.sin(this.time), 200 + 100 * Math.cos(this.time)],
-                            [300 - 200 * Math.sin(this.time / 3), 300 - 200 * Math.cos(this.time / 3)],
-                            [400, 400],
-
-                            [400, 400],
-                            [500 - 200 * Math.sin(this.time / 5), 500 - 200 * Math.cos(this.time / 5)],
-                            [600, 600],
-                            [700, 700],
-                        ],
-                        { segments: 64, width: 4, loop: this.loop, linecap: this.linecap, r: 0 }
-                    )
-                    .end();
+                this.assetManager.getMesh('Test_Level_1.obj')?.draw();
 
                 for (const gameObject of this.gameObjects) gameObject.draw(deltaTime);
             }
