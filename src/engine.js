@@ -3,10 +3,10 @@ import InputManager from './input-manager.js';
 import { MultisampleRenderPass } from './renderer/render-pass.js';
 import Renderer from './renderer/renderer.js';
 import SpriteBatch from './renderer/sprite-batch.js';
-import Matrix4 from './matrix4.js';
 import VectorRenderer from './renderer/vector-renderer.js';
-import { Vec4 } from '@vvatashi/js-vec-math/src/vec4.js';
-import { Vec3 } from '@vvatashi/js-vec-math/src/vec3.js';
+import Vec4 from '@vvatashi/js-vec-math/src/vec4.js';
+import Vec3 from '@vvatashi/js-vec-math/src/vec3.js';
+import Mat4 from '@vvatashi/js-vec-math/src/mat4.js';
 
 const FIXED_UPDATE_TIMESTEP = 60 / 1000;
 
@@ -78,20 +78,15 @@ export class Engine {
         this.multisampleRenderPass.resize(this.canvas.width, this.canvas.height);
         this.renderer.resize();
 
-        this.levelModelMatrix = Matrix4.createIdentity();
-        this.viewMatrix = Matrix4.lookAt([15, 15, 15], [15, 0, 0], [0, 1, 0]);
-        this.projectionMatrix = Matrix4.createPerspectiveFieldOfView(
-            (80 * Math.PI) / 180,
-            this.canvas.width / this.canvas.height,
-            0.1,
-            1000
-        );
+        this.levelModelMatrix = Mat4.identity;
+        this.viewMatrix = Mat4.lookAt([15, 15, 15], [15, 0, 0], [0, 1, 0]);
+        this.projectionMatrix = Mat4.perspectiveFieldOfView((80 * Math.PI) / 180, this.canvas.width / this.canvas.height, 0.1, 1000);
 
-        this.viewProjectionMatrix = Matrix4.multiply(this.viewMatrix, this.projectionMatrix);
+        this.viewProjectionMatrix = Mat4.multiply(this.viewMatrix, this.projectionMatrix);
 
-        this.inverseViewMatrix = this.viewMatrix.invert();
-        this.inverseProjectionMatrix = this.projectionMatrix.invert();
-        this.inverseViewProjectionMatrix = this.viewProjectionMatrix.invert();
+        this.inverseViewMatrix = Mat4.inverted(this.viewMatrix);
+        this.inverseProjectionMatrix = Mat4.inverted(this.projectionMatrix);
+        this.inverseViewProjectionMatrix = Mat4.inverted(this.viewProjectionMatrix);
     }
 
     fixedUpdate(deltaTime) {
@@ -104,22 +99,20 @@ export class Engine {
         const x = (2 * this.inputManager.mouseX) / this.canvas.width - 1;
         const y = (-2 * this.inputManager.mouseY) / this.canvas.height + 1;
 
-        let nearPoint = new Vec4(x, y, 0, 1);
-        nearPoint = this.inverseViewProjectionMatrix.transform(nearPoint);
+        const nearPoint = new Vec4(x, y, 0, 1).transform(this.inverseViewProjectionMatrix);
         nearPoint.divide(nearPoint[3]);
 
-        let farPoint = new Vec4(x, y, 1, 1);
-        farPoint = this.inverseViewProjectionMatrix.transform(farPoint);
+        const farPoint = new Vec4(x, y, 1, 1).transform(this.inverseViewProjectionMatrix);
         farPoint.divide(farPoint[3]);
 
-        let origin = new Vec3(nearPoint.xyz);
-        let direction = new Vec3(farPoint.xyz).subtract(nearPoint).normalize();
+        const origin = new Vec3(nearPoint.xyz);
+        const direction = new Vec3(farPoint.xyz).subtract(nearPoint).normalize();
 
         const t = -origin.y / direction.y;
         const intersectionPoint = new Vec3(direction).multiply(t).add(origin);
 
         this.intersectionPoint = intersectionPoint;
-        this.intersectionModelMatrix = Matrix4.createTranslation(intersectionPoint[0], intersectionPoint[1], intersectionPoint[2]);
+        this.intersectionModelMatrix = Mat4.translation(...intersectionPoint);
 
         if (this.inputManager.leftMouseButtonPressed) {
             console.log('Screen', this.inputManager.mouseX, this.inputManager.mouseY);

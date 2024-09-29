@@ -16,6 +16,8 @@ export class ShaderProgram {
 
         this.context = context;
         this.handle = handle;
+
+        /** @type {Object.<string, WebGLUniformLocation>} */
         this.uniformLocationCache = {};
     }
 
@@ -41,6 +43,7 @@ export class ShaderProgram {
         return this;
     }
 
+    /** @param {string} name */
     getUniformLocation(name) {
         const { context, handle, uniformLocationCache } = this;
         if (name in uniformLocationCache) return uniformLocationCache[name];
@@ -48,6 +51,10 @@ export class ShaderProgram {
         return (uniformLocationCache[name] = context.getUniformLocation(handle, name));
     }
 
+    /**
+     * @param {string} name
+     * @param {number} value
+     */
     setUniformInteger(name, value) {
         const { context } = this;
         this.bind();
@@ -59,6 +66,10 @@ export class ShaderProgram {
         return this;
     }
 
+    /**
+     * @param {string} name
+     * @param {number} value
+     */
     setUniformFloat(name, value) {
         const { context } = this;
         this.bind();
@@ -69,6 +80,10 @@ export class ShaderProgram {
         return this;
     }
 
+    /**
+     * @param {string} name
+     * @param {number[]|Float32Array} value
+     */
     setUniformMatrix(name, value, transpose = false) {
         const { context } = this;
         this.bind();
