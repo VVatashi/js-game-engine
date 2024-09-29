@@ -1,5 +1,6 @@
 #version 300 es
 
+uniform mat4 modelMatrix;
 uniform mat4 viewMatrix;
 uniform mat4 projectionMatrix;
 
@@ -12,7 +13,7 @@ out vec2 fragTexCoords;
 out vec3 fragNormal;
 
 void main() {
-    gl_Position = projectionMatrix * viewMatrix * vec4(position, 1.0);
+    gl_Position = projectionMatrix * viewMatrix * modelMatrix * vec4(position, 1.0);
 
     fragPosition = position;
     fragTexCoords = texCoords;
