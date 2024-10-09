@@ -84,6 +84,48 @@ export class ShaderProgram {
      * @param {string} name
      * @param {number[]|Float32Array} value
      */
+    setUniformVec2(name, value) {
+        const { context } = this;
+        this.bind();
+
+        const location = this.getUniformLocation(name);
+        context.uniform2fv(location, value);
+
+        return this;
+    }
+
+    /**
+     * @param {string} name
+     * @param {number[]|Float32Array} value
+     */
+    setUniformVec3(name, value) {
+        const { context } = this;
+        this.bind();
+
+        const location = this.getUniformLocation(name);
+        context.uniform3fv(location, value);
+
+        return this;
+    }
+
+    /**
+     * @param {string} name
+     * @param {number[]|Float32Array} value
+     */
+    setUniformVec4(name, value) {
+        const { context } = this;
+        this.bind();
+
+        const location = this.getUniformLocation(name);
+        context.uniform4fv(location, value);
+
+        return this;
+    }
+
+    /**
+     * @param {string} name
+     * @param {number[]|Float32Array} value
+     */
     setUniformMatrix(name, value, transpose = false) {
         const { context } = this;
         this.bind();

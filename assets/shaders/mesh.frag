@@ -2,17 +2,22 @@
 
 precision mediump float;
 
-uniform sampler2D colorTexture;
+uniform vec3 lightDirection;
+
+uniform sampler2D diffuseTexture;
 
 in vec3 fragPosition;
 in vec2 fragTexCoords;
 in vec3 fragNormal;
 
+in vec4 fragAmbientColor;
+in vec4 fragDiffuseColor;
+in vec4 fragSpecularColor;
+
 out vec4 color;
 
 void main() {
-    float ambient = 0.2;
-    float diffuse = 0.8 * max(0.0, dot(fragNormal, normalize(vec3(2, 3, 1))));
+    float diffuse = max(0.0, dot(fragNormal, lightDirection));
 
-    color = (ambient + diffuse) * texture(colorTexture, fragTexCoords);
+    color = fragAmbientColor + diffuse * fragDiffuseColor * texture(diffuseTexture, fragTexCoords);
 }

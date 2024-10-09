@@ -1,96 +1,30 @@
 [
     {
         "type": "texture",
-        "name": "1.png",
-        "metadata": {}
-    },
-    {
-        "type": "texture",
-        "name": "Body_tex_003.png",
-        "metadata": {}
-    },
-    {
-        "type": "texture",
-        "name": "Face_tex_002_toObj.png",
-        "metadata": {}
-    },
-    {
-        "type": "texture",
-        "name": "Hair_tex_001.png",
-        "metadata": {}
-    },
-    {
-        "type": "texture",
-        "name": "white.png",
-        "metadata": {}
+        "name": "white.png"
     },
     {
         "type": "shader",
-        "name": "mesh",
-        "metadata": {}
+        "name": "mesh"
     },
     {
         "type": "shader",
-        "name": "simple",
-        "metadata": {}
+        "name": "simple"
     },
     {
         "type": "shader",
-        "name": "screen",
-        "metadata": {}
+        "name": "screen"
     },
     {
-        "type": "mesh",
-        "name": "Elf01_body.obj",
-        "metadata": {
-            "positionElements": 3,
-            "texCoordElements": 2,
-            "normalElements": 3
-        }
+        "type": "model",
+        "name": "quad.obj"
     },
     {
-        "type": "mesh",
-        "name": "Elf01_face.obj",
-        "metadata": {
-            "positionElements": 3,
-            "texCoordElements": 2,
-            "normalElements": 3
-        }
+        "type": "model",
+        "name": "Test_Level_1.obj"
     },
     {
-        "type": "mesh",
-        "name": "Elf01_hair.obj",
-        "metadata": {
-            "positionElements": 3,
-            "texCoordElements": 2,
-            "normalElements": 3
-        }
-    },
-    {
-        "type": "mesh",
-        "name": "quad.obj",
-        "metadata": {
-            "positionElements": 2,
-            "texCoordElements": 2,
-            "normalElements": false
-        }
-    },
-    {
-        "type": "mesh",
-        "name": "teapot.obj",
-        "metadata": {
-            "positionElements": 3,
-            "texCoordElements": 2,
-            "normalElements": 3
-        }
-    },
-    {
-        "type": "mesh",
-        "name": "Test_Level_1.obj",
-        "metadata": {
-            "positionElements": 3,
-            "texCoordElements": 2,
-            "normalElements": 3
-        }
+        "type": "model",
+        "name": "teapot.obj"
     }
 ]

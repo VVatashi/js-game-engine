@@ -3,9 +3,9 @@ export class Renderer {
     constructor(canvas) {
         this.context = canvas.getContext('webgl2', { antialias: false });
 
-        // this.context.enable(this.context.CULL_FACE);
-        // this.context.cullFace(this.context.BACK);
-        // this.context.frontFace(this.context.CCW);
+        this.context.enable(this.context.CULL_FACE);
+        this.context.cullFace(this.context.BACK);
+        this.context.frontFace(this.context.CCW);
 
         this.context.enable(this.context.DEPTH_TEST);
         this.context.depthFunc(this.context.LEQUAL);

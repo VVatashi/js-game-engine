@@ -34,7 +34,9 @@ export class Engine {
         fetch('./assets/assets.json').then(async (response) => {
             /** @type {import('./asset-manager.js').Asset[]} */
             const assets = await response.json();
-            for (const asset of assets) this.assetManager.register(asset.type, asset.name, asset.metadata);
+            for (const asset of assets) {
+                this.assetManager.register(asset.type, asset.name, asset.metadata || {});
+            }
 
             await Promise.all(assets.map((asset) => this.assetManager.load(asset.type, asset.name)));
 
@@ -78,23 +80,23 @@ export class Engine {
         this.multisampleRenderPass.resize(this.canvas.width, this.canvas.height);
         this.renderer.resize();
 
-        this.levelModelMatrix = Mat4.identity;
         this.viewMatrix = Mat4.lookAt([15, 15, 15], [15, 0, 0], [0, 1, 0]);
         this.projectionMatrix = Mat4.perspectiveFieldOfView((80 * Math.PI) / 180, this.canvas.width / this.canvas.height, 0.1, 1000);
 
         this.viewProjectionMatrix = Mat4.multiply(this.viewMatrix, this.projectionMatrix);
-
-        this.inverseViewMatrix = Mat4.inverted(this.viewMatrix);
-        this.inverseProjectionMatrix = Mat4.inverted(this.projectionMatrix);
         this.inverseViewProjectionMatrix = Mat4.inverted(this.viewProjectionMatrix);
     }
 
     fixedUpdate(deltaTime) {
-        for (const gameObject of this.gameObjects) gameObject.fixedUpdate(deltaTime);
+        for (const gameObject of this.gameObjects) {
+            gameObject.fixedUpdate(deltaTime);
+        }
     }
 
     update(deltaTime) {
-        for (const gameObject of this.gameObjects) gameObject.update(deltaTime);
+        for (const gameObject of this.gameObjects) {
+            gameObject.update(deltaTime);
+        }
 
         const x = (2 * this.inputManager.mouseX) / this.canvas.width - 1;
         const y = (-2 * this.inputManager.mouseY) / this.canvas.height + 1;
@@ -114,15 +116,6 @@ export class Engine {
         this.intersectionPoint = intersectionPoint;
         this.intersectionModelMatrix = Mat4.translation(...intersectionPoint);
 
-        if (this.inputManager.leftMouseButtonPressed) {
-            console.log('Screen', this.inputManager.mouseX, this.inputManager.mouseY);
-            console.log('Clip space', x, y);
-            console.log('Near plane intersection', ...nearPoint.xyz);
-            console.log('Far plane intersection', ...farPoint.xyz);
-            console.log('Ray direction', ...direction);
-            console.log('y=0 plane intersection', ...intersectionPoint);
-        }
-
         this.inputManager.resetPressedButtons();
     }
 
@@ -137,20 +130,25 @@ export class Engine {
             if (shaderProgram !== null) {
                 shaderProgram
                     .bind()
-                    .setUniformMatrix('projectionMatrix', this.projectionMatrix)
-                    .setUniformMatrix('viewMatrix', this.viewMatrix)
-                    .setUniformMatrix('modelMatrix', this.levelModelMatrix)
-                    .setUniformInteger('colorTexture', 0);
+                    .setUniformMatrix('modelViewProjectionMatrix', this.viewProjectionMatrix)
+                    .setUniformVec3('lightDirection', new Vec3([1.5, 2, 1]).normalize())
+                    .setUniformInteger('diffuseTexture', 0);
 
                 this.assetManager.getTexture('white.png')?.bind();
-                this.assetManager.getMesh('Test_Level_1.obj')?.draw();
+                this.assetManager.getModel('Test_Level_1.obj')?.draw(shaderProgram);
 
                 if (this.intersectionPoint) {
-                    shaderProgram.setUniformMatrix('modelMatrix', this.intersectionModelMatrix);
-                    this.assetManager.getMesh('teapot.obj')?.draw();
+                    shaderProgram.setUniformMatrix(
+                        'modelViewProjectionMatrix',
+                        Mat4.multiply(this.intersectionModelMatrix, this.viewProjectionMatrix)
+                    );
+
+                    this.assetManager.getModel('teapot.obj')?.draw(shaderProgram);
                 }
 
-                for (const gameObject of this.gameObjects) gameObject.draw(deltaTime);
+                for (const gameObject of this.gameObjects) {
+                    gameObject.draw(deltaTime);
+                }
             }
         }
         this.multisampleRenderPass.end();
@@ -161,7 +159,7 @@ export class Engine {
             screenShaderProgram.bind().setUniformInteger('colorTexture', 0);
 
             this.multisampleRenderPass.attachment?.bind(0);
-            this.assetManager.getMesh('quad.obj')?.draw();
+            this.assetManager.getModel('quad.obj')?.draw(screenShaderProgram);
         }
     }
 }

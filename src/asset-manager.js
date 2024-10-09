@@ -1,4 +1,7 @@
+import ObjLoader from './obj-loader.js';
+import Material from './renderer/material.js';
 import Mesh from './renderer/mesh.js';
+import Model from './renderer/model.js';
 import ShaderProgram from './renderer/webgl/shader-program.js';
 import Shader from './renderer/webgl/shader.js';
 import Texture2D from './renderer/webgl/texture2d.js';
@@ -6,10 +9,12 @@ import Texture2D from './renderer/webgl/texture2d.js';
 export const ASSET_TYPE_TEXTURE = 'texture';
 export const ASSET_TYPE_SHADER = 'shader';
 export const ASSET_TYPE_MESH = 'mesh';
+export const ASSET_TYPE_MATERIAL = 'material';
+export const ASSET_TYPE_MODEL = 'model';
 
 /**
  * @typedef {Object} Asset
- * @property {ASSET_TYPE_TEXTURE|ASSET_TYPE_SHADER|ASSET_TYPE_MESH} type
+ * @property {ASSET_TYPE_TEXTURE|ASSET_TYPE_SHADER|ASSET_TYPE_MESH|ASSET_TYPE_MATERIAL|ASSET_TYPE_MODEL} type
  * @property {string} name
  * @property {Object} metadata
  * @property {Object} data
@@ -44,27 +49,6 @@ export class AssetManager {
     }
 
     /**
-     * @param {string} name
-     */
-    registerTexture(name) {
-        return this.register(ASSET_TYPE_TEXTURE, name);
-    }
-
-    /**
-     * @param {string} name
-     */
-    registerShader(name) {
-        return this.register(ASSET_TYPE_SHADER, name);
-    }
-
-    /**
-     * @param {string} name
-     */
-    registerMesh(name) {
-        return this.register(ASSET_TYPE_MESH, name);
-    }
-
-    /**
      * @param {string} type
      * @param {string} name
      */
@@ -90,10 +74,10 @@ export class AssetManager {
                 asset.loaded = true;
                 break;
 
-            case ASSET_TYPE_MESH:
-                const mesh = await Mesh.createFromObjUrl(this.context, `./assets/meshes/${name}`, asset.metadata);
-
-                asset.data = mesh;
+            case ASSET_TYPE_MODEL:
+                const loader = new ObjLoader(this.context);
+                await loader.loadObjFromUrl(`./assets/models/${name}`, asset.metadata);
+                asset.data = loader.toModel();
                 asset.loaded = true;
                 break;
 
@@ -103,27 +87,6 @@ export class AssetManager {
         }
 
         return asset;
-    }
-
-    /**
-     * @param {string} name
-     */
-    loadTexture(name) {
-        return this.load(ASSET_TYPE_TEXTURE, name);
-    }
-
-    /**
-     * @param {string} name
-     */
-    loadShader(name) {
-        return this.load(ASSET_TYPE_SHADER, name);
-    }
-
-    /**
-     * @param {string} name
-     */
-    loadMesh(name) {
-        return this.load(ASSET_TYPE_MESH, name);
     }
 
     /**
@@ -161,6 +124,22 @@ export class AssetManager {
      */
     getMesh(name) {
         return this.get(ASSET_TYPE_MESH, name);
+    }
+
+    /**
+     * @param {string} name
+     * @return {Material}
+     */
+    getMaterial(name) {
+        return this.get(ASSET_TYPE_MATERIAL, name);
+    }
+
+    /**
+     * @param {string} name
+     * @return {Model}
+     */
+    getModel(name) {
+        return this.get(ASSET_TYPE_MODEL, name);
     }
 }
 
